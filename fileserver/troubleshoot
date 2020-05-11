@@ -1,0 +1,20 @@
+- Check kube nodes
+    > kubectl get pods
+    Possible Error
+        > docker service down
+        > kub-apiserver down
+        > kubectl config
+- Check docker service
+    > systemctl status docker
+- Check kube-apiserver
+    > docker ps -a
+    > docker container logs <id>
+    >> check config /etc/kubernetes/manifests/kube-apiserver.yaml
+- Check kubectl config: $HOME/.kube/config
+    >> cluster.server value (https://IP:port)
+    >> contect.user
+- Check addon
+    > kubectl get pod -n kube-system
+    > kubectl -n kube-system edit deployments. coredns
+- Enable node
+    > kubectl uncordon node01

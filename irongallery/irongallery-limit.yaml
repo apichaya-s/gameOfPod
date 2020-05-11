@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: LimitRange
+metadata:
+  name: iron-gallery-limit
+spec:
+  limits:
+  - type: Container
+    # guarantee resource
+    default: 
+      memory: 100Mi # MiB
+    # maximum amount of resources 
+    defaultRequest: 
+      cpu: 50m # millicpus
+    

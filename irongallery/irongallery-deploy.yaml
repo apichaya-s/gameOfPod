@@ -1,0 +1,41 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: iron-gallery
+spec:
+  # number of pod
+  replicas: 1
+  selector:
+    matchLabels:
+      # deploy to pod
+      run: iron-gallery
+  template:
+    # pod properties
+    metadata:
+      labels:
+        run: iron-gallery
+    spec:
+      volumes:
+        - name: config
+          # Stored on whatever medium is backing the node
+          # delete along with pod
+          # can map to tmpfs (RAM-backed filesystem) if specific 'emptyDir.medium: Memory'
+          emptyDir: {}
+        - name: images
+          emptyDir: {}
+
+      containers:
+        - name: iron-gallery
+          image: kodekloud/irongallery:2.0
+          ports:
+            - containerPort: 80
+          resources:
+            limits:
+              memory: 100Mi # MiB
+              cpu: 50m # millicpus
+
+          volumeMounts:
+            - mountPath: /usr/share/nginx/html/data
+              name: config
+            - mountPath: /usr/share/nginx/html/uploads
+              name: images

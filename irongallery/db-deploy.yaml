@@ -1,0 +1,41 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: iron-db
+spec:
+  # number of pod
+  replicas: 1
+  selector:
+    matchLabels:
+      # deploy to pod
+      db: mariadb
+  template:
+    # pod properties
+    metadata:
+      labels:
+        db: mariadb
+    spec:
+      volumes:
+        - name: db
+          # Stored on whatever medium is backing the node
+          # delete along with pod
+          # can map to tmpfs (RAM-backed filesystem) if specific 'emptyDir.medium: Memory'
+          emptyDir: {}
+
+      containers:
+        - name: iron-gallery
+          image: kodekloud/irondb:2.0
+          ports:
+            - containerPort: 3306
+          volumeMounts:
+            - mountPath: /var/lib/mysql
+              name: db
+          env:
+            - name: MYSQL_ROOT_PASSWORD
+              value: Braavo
+            - name: MYSQL_DATABASE
+              value: lychee
+            - name: MYSQL_USER
+              value: lychee
+            - name: MYSQL_PASSWORD
+              value: lychee

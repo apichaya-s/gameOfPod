@@ -1,0 +1,37 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: db-deployment
+  namespace: vote
+spec:
+  # number of pod
+  replicas: 1
+  selector:
+    matchLabels:
+      # deploy to pod
+      label: db-deployment
+  template:
+    # pod properties
+    metadata:
+      labels:
+        label: db-deployment
+    spec:
+      containers:
+        - name: db-deployment
+          image: postgres:9.4
+          ports:
+            - containerPort: 5432
+          env:
+            - name: POSTGRES_PASSWORD
+              value: password
+            - name: POSTGRES_USER
+              value: postgres
+          volumeMounts:
+            - mountPath: /var/lib/postgresql/data
+              name: db-data
+      volumes:
+        - name: db-data
+          # Stored on whatever medium is backing the node
+          # delete along with pod
+          # can map to tmpfs (RAM-backed filesystem) if specific 'emptyDir.medium: Memory'
+          emptyDir: {}

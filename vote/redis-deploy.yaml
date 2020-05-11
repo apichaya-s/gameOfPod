@@ -1,0 +1,32 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: redis-deployment
+  namespace: vote
+spec:
+  # number of pod
+  replicas: 1
+  selector:
+    matchLabels:
+      # deploy to pod
+      label: redis-deployment
+  template:
+    # pod properties
+    metadata:
+      labels:
+        label: redis-deployment
+    spec:
+      containers:
+        - name: redis-deployment
+          image: redis:alpine
+          ports:
+            - containerPort: 6379
+          volumeMounts:
+            - mountPath:  /data
+              name: redis-data
+      volumes:
+        - name: redis-data
+          # Stored on whatever medium is backing the node
+          # delete along with pod
+          # can map to tmpfs (RAM-backed filesystem) if specific 'emptyDir.medium: Memory'
+          emptyDir: {}

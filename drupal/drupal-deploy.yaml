@@ -1,0 +1,56 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  # deployment name
+  name: drupal
+  labels:
+    app: drupal
+spec:
+  # number of pod
+  replicas: 1
+  selector:
+    matchLabels:
+      # deploy to pod
+      app: drupal
+  template:
+    # pod properties
+    metadata:
+      labels:
+        app: drupal
+    spec:
+      volumes:
+        - name: drupal-pv
+          # claim to use a persistent volume
+          persistentVolumeClaim:
+            claimName: drupal-pvc
+      # https://kubernetes.io/docs/concepts/workloads/pods/init-containers/
+      # initContainers is for waiting other service, pull source, dynamic config
+      # the init container will only run completable command (not inprogress process)
+      # containers will not run until initContainers done without error
+      initContainers:
+        - name: init-sites-volume
+          image: 'drupal:8.6'
+          volumeMounts:
+            - mountPath: /data
+              name: drupal-pv
+          command: [ "/bin/bash", "-c" ]
+          args: [ 'cp -r /var/www/html/sites/ /data/; chown www-data:www-data /data/ -R' ]
+      containers:
+        - name: drupal
+          image: 'drupal:8.6'
+          ports:
+            - containerPort: 80
+          volumeMounts:
+            # allocate space from the same volume to each mount with subpath
+            - mountPath:  /var/www/html/modules
+              name: drupal-pv
+              subPath: modules
+            - mountPath:  /var/www/html/profiles
+              name: drupal-pv
+              subPath: profiles
+            - mountPath:  /var/www/html/sites
+              name: drupal-pv
+              subPath: sites
+            - mountPath:  /var/www/html/themes
+              name: drupal-pv
+              subPath: themes

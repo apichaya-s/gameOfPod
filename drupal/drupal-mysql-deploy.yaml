@@ -1,0 +1,49 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: drupal-mysql
+spec:
+  # number of pod
+  replicas: 1
+  selector:
+    matchLabels:
+      # deploy to pod
+      app: drupal-mysql
+  template:
+    # pod properties
+    metadata:
+      labels:
+        app: drupal-mysql
+    spec:
+      volumes:
+        - name: drupal-mysql-pv
+          persistentVolumeClaim:
+            claimName: drupal-mysql-pvc
+
+      containers:
+        - name: drupal-mysql
+          image: 'mysql:5.7'
+          ports:
+            - containerPort: 3306
+          volumeMounts:
+            - mountPath: /var/lib/mysql
+              name: drupal-mysql-pv
+              subPath: dbdata
+          # set environment variables
+          env:
+            - name: MYSQL_ROOT_PASSWORD
+              # get value from secret resource
+              valueFrom:
+                secretKeyRef:
+                  name: drupal-mysql-secret
+                  key: MYSQL_ROOT_PASSWORD
+            - name: MYSQL_DATABASE
+              valueFrom:
+                secretKeyRef:
+                  name: drupal-mysql-secret
+                  key: MYSQL_DATABASE
+            - name: MYSQL_USER
+              valueFrom:
+                secretKeyRef:
+                  name: drupal-mysql-secret
+                  key: MYSQL_USER
